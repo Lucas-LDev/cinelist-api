@@ -1,4 +1,4 @@
-package com.cinelist.cinelist_api;
+package com.cinelist.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
