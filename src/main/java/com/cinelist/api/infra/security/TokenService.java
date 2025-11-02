@@ -67,11 +67,14 @@ public class TokenService {
     public String validateAccessToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(tokenSecret);
-            return JWT.require(algorithm)
+            var decodedJWT = JWT.require(algorithm)
                     .withIssuer("auth-api")
+                    .withClaim("type", "refresh")
                     .build()
-                    .verify(token)
-                    .getSubject();
+                    .verify(token);
+
+            refreshTokenService.validateStoredToken(token);
+            return decodedJWT.getSubject();
         } catch (JWTVerificationException exception) {
             throw new InvalidTokenException("Expired or Invalid access token");
         }
