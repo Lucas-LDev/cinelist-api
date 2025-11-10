@@ -3,6 +3,7 @@ package com.cinelist.api.tmdb;
 import com.cinelist.api.tmdb.dtos.MovieResponseDTO;
 import com.cinelist.api.tmdb.dtos.MovieSummaryResponseDTO;
 import com.cinelist.api.tmdb.dtos.TmdbPagedResponseDTO;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,6 +21,7 @@ public class TmdbService {
         this.tmdbWebClient = tmdbWebClient;
     }
 
+    @Cacheable(value = "trending", key = "#timeWindow")
     public Mono<TmdbPagedResponseDTO<MovieSummaryResponseDTO>> getTrendingMovies(String timeWindow) {
         return tmdbWebClient.get()
                 .uri("/trending/movie/{time_window}?language=pt-BR", timeWindow)
@@ -46,6 +48,7 @@ public class TmdbService {
                 .map(TmdbPagedResponseDTO::results);
     }
 
+    @Cacheable(value = "discover_movies", key = "#spec.hashCode()")
     public Mono<TmdbPagedResponseDTO<MovieSummaryResponseDTO>> discoverMovies(TmdbMovieSpecification spec) {
         return Flux.range(1, 3)
                 .flatMap(page -> fetchMoviesPage(spec, page))
@@ -56,8 +59,7 @@ public class TmdbService {
                 .map(list -> new TmdbPagedResponseDTO<>(1, list, 1, list.size()));
     }
 
-
-
+    @Cacheable(value = "get_movie", key = "#movieId")
     public Mono<MovieResponseDTO> getMovieDetails(Long movieId) {
         return tmdbWebClient.get()
                 .uri("/movie/{movieId}?language=pt-BR&append_to_response=credits", movieId)

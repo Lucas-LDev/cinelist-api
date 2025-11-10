@@ -49,4 +49,17 @@ public class TmdbMovieSpecification {
     public Map<String, Object> build() {
         return filters;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TmdbMovieSpecification)) return false;
+        TmdbMovieSpecification that = (TmdbMovieSpecification) o;
+        return filters.equals(that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return filters.hashCode();
+    }
 }
